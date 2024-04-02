@@ -41,7 +41,7 @@ async def get_precipitation(i, data={}):
                                                              class_="day__additional")[4].text.replace('\n', '').replace('\t', '')
     return data
 
-list_of_func =[get_date, get_breeze, get_description, get_humidity, get_description, get_precipitation] 
+list_of_func = [get_date, get_breeze, get_description, get_humidity, get_description, get_precipitation] 
 
 # print(get_date(1))
 # print(data)

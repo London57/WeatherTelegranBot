@@ -1,12 +1,21 @@
+from aiogram import Bot, Dispatcher, types
 import asyncio
-from functions import *
+from aiogram.filters import CommandStart
 
-async def main(i, result_dict={}, tasks=[]):
-    for func in list_of_func:
-        tasks.append(asyncio.create_task(func(i)))
-    for j in tasks:
-        result_dict.update(await j)
-    return result_dict
+from dotenv import load_dotenv, find_dotenv
+import os
+load_dotenv(find_dotenv())
 
-res = asyncio.run(main(2))
-print(res)
+
+ALLOWED_UPDATES = ['message']
+bot = Bot(token=os.getenv('TOKEN'))
+
+dp = Dispatcher()
+
+
+async def main():
+    await bot.delete_webhook(drop_pending_updates=True)
+    await dp.start_polling(bot, allowed_updates=ALLOWED_UPDATES)
+
+
+asyncio.run(main())
