@@ -99,7 +99,7 @@ def weather(message):
     data_temp_feel_like = []
     data_timely_1 = []
     data_timely_2 = []
-    url = f'https://yandex.ru/pogoda/{city}/details/10-day-weather?via=ms#10'
+    url = f'https://yandex.ru/pogoda/{city}'
     response = requests.get(url)
     soup = BeautifulSoup(response.text, 'lxml')
 
