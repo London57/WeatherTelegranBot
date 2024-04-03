@@ -1,11 +1,10 @@
 from bs4 import BeautifulSoup
 import requests
-import undetected_chromedriver
 
 # response = driver.get('https://yandex.ru/pogoda/Kazan')
-url = f'https://pogoda.mail.ru/prognoz/almetyevsk/'
+url = 'https://pogoda.mail.ru/prognoz/almetyevsk/'
 response = requests.get(url)
-# print(response.content)
+
 soup = BeautifulSoup(response.text, 'lxml')
 
 
@@ -43,5 +42,3 @@ async def get_precipitation(i, data={}):
 
 list_of_func = [get_date, get_breeze, get_description, get_humidity, get_description, get_precipitation] 
 
-# print(get_date(1))
-# print(data)
