@@ -1,5 +1,5 @@
 import asyncio
-from functions import *
+from .functions import *
 
 async def main(i, result_dict={}, tasks=[]):
     for func in list_of_func:
@@ -8,5 +8,5 @@ async def main(i, result_dict={}, tasks=[]):
         result_dict.update(await j)
     return result_dict
 
-res = asyncio.run(main(2))
-print(res)
+
+# print(res)

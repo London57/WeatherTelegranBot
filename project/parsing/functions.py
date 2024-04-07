@@ -8,6 +8,11 @@ response = requests.get(url)
 soup = BeautifulSoup(response.text, 'lxml')
 
 
+async def dates(i):
+    data = soup.find_all('div', class_="day day_index")[i].find('div',
+                                                             class_="day__date").text
+    return data
+
 async def get_date(i, data={}):
     data['date'] = soup.find_all('div', class_="day day_index")[i].find('div',
                                                              class_="day__date").text
