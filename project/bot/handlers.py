@@ -35,12 +35,7 @@ async def get_day(message: types.Message, state: FSMContext):
 async def show_weather(message: types.Message, state: FSMContext):
     await state.update_data(day=message.text)
     data = await state.get_data()
-    # weather = loop.main(callback_query_dict[data['day']])
-    # loop = asyncio.new_event_loop()
-    # res = loop.run_until_complete(main(2))
-    # loop.close()
-    # await message.answer(str(res))
-
-    #
-    ...
+    res_data = await asyncio.create_task(main(callback_query_dict[data['day']]))
+    await message.answer(str(res_data))
+    
     await state.clear()

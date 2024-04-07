@@ -11,4 +11,3 @@ async def main():
 
 
 asyncio.run(main())
-print(__name__, 'main')
