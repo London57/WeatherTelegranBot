@@ -1,5 +1,5 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
-from parsing.functions import dates
+from project.parsing.functions import dates
 import asyncio
 
 

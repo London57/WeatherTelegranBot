@@ -25,11 +25,20 @@ async def start_bot(message: types.Message, state: FSMContext):
 @user_private_router.message(StateFilter(GetWeather.name), F.text)
 async def get_day(message: types.Message, state: FSMContext):
     await state.update_data(name=message.text)
+    global city
+    city='123'
     await message.answer(
         'Выберите день',
         reply_markup=keyboard,
         )
     await state.set_state(GetWeather.day)
+
+def get_city():
+    # try:
+    return city
+    # except:
+    #     pass
+
 
 @user_private_router.message(StateFilter(GetWeather.day), F.text)
 async def show_weather(message: types.Message, state: FSMContext):
