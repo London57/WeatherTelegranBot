@@ -47,7 +47,7 @@ async def show_weather(message: types.Message, state: FSMContext):
     data = await state.get_data()
 
     day_dict, _ = await parser.get_days_dict_and_list()
-    res_data = await asyncio.create_task(main(parser=parser, i=day_dict[data['day']]))
+    res_data = await asyncio.create_task(parser.get_result_data(day=day_dict[data['day']]))
     # res_data = await asyncio.create_task(main(callback_query_dict[data['day']]))
     await message.answer(str(res_data))
     
