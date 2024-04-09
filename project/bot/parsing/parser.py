@@ -2,15 +2,19 @@
 from bs4 import BeautifulSoup
 import requests, asyncio
 
-class Parsing:
+class Parser:
 
     def __init__(self, city):
         self.city = city
         self.soup = BeautifulSoup(requests.get(f'https://pogoda.mail.ru/prognoz/{city}/').text, 'lxml')
     
     async def dates(self, day):
-        data = self.soup.find_all('div', class_="day day_index")[day].find('div',
+        if day == 0:
+            data = 'Сегодня'
+        else:
+            data = self.soup.find_all('div', class_="day day_index")[day-1].find('div',
                                                              class_="day__date").text
+        
         return data
 
     async def get_date(self, day, data={}):
