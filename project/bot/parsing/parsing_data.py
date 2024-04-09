@@ -1,5 +1,5 @@
 import asyncio
-from .functions import *
+from .functions import list_of_func
 
 async def main(i, result_dict={}, tasks=[]):
     for func in list_of_func:

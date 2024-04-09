@@ -1,6 +1,6 @@
-from project.bot.bot import bot
+from bot.bot import bot
 import asyncio
-from project.bot.handlers import dp
+from bot.handlers import dp
 
 
 ALLOWED_UPDATES = ['message']
