@@ -10,10 +10,7 @@ async def get_keyboard(parser, tasks=[], day_list=[]):
     #create task for today day here
     for task in tasks:
         day_list.append(await task)
-    # loop = asyncio.get_event_loop()
-    # courotine = loop.create_task(get_dates())
-    # day_list = loop.run_until_complete(courotine)
-    # global callback_query_dict
+   
     # callback_query_dict = {day_list[i]: i for i in range(7)}
 
     keyboard = ReplyKeyboardMarkup(

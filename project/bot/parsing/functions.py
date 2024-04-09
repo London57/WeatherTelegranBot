@@ -1,8 +1,9 @@
 
 from bs4 import BeautifulSoup
-import requests
+import requests, asyncio
 
 class Parsing:
+    
     
     def __init__(self, city):
         self.city = city
@@ -44,6 +45,21 @@ class Parsing:
         data['precipitation'] = self.soup.find_all('div', class_="day day_index")[i].find_all('div',
                                                                 class_="day__additional")[4].text.replace('\n', '').replace('\t', '')
         return data
+    
+
+    async def get_functions_list(self):
+        return [self.get_date, self.get_breeze, self.get_description, self.get_humidity, self.get_description, self.get_precipitation] 
+
+    
+    async def get_days_dict_and_list(self, *args, days_list=[], tasks=[]):
+        for i in range(7):
+            tasks.append(asyncio.create_task(self.dates(i)))
+        
+        #create task for today day here
+        for task in tasks:
+            days_list.append(await task)
+        days_dict = {days_list[i]: i for i in range(7)}
+        return days_dict, days_list
         
 
 # url = f'https://pogoda.mail.ru/prognoz/Almetyevsk/'
@@ -54,5 +70,5 @@ class Parsing:
 
 
 
-list_of_func = [Parsing.get_date, Parsing.get_breeze, Parsing.get_description, Parsing.get_humidity, Parsing.get_description, Parsing.get_precipitation] 
+
 
