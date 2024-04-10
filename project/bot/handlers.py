@@ -1,23 +1,27 @@
 from aiogram import Router, types, Dispatcher
 from aiogram import F
-from aiogram.filters import CommandStart, StateFilter, or_f, Command
+from aiogram.filters import CommandStart, StateFilter, and_f, Command
 from aiogram.fsm.context import FSMContext
 from .keyboards import get_keyboard
 from .fsm import GetWeather
 import asyncio
-from .parsing.parser import Parser
+from .parsing.parsers import Parser
 import requests
+from.bot import bot
 
 dp = Dispatcher()
 
 user_private_router = Router()
 
-dp.include_router(user_private_router)
+dp.include_router(user_private_router) 
+ 
 
-@user_private_router.message(Command('start'))
+@user_private_router.message(Command('go'))
 async def start_bot(message: types.Message, state: FSMContext):
+    print(message.text, 'start')
     await message.answer(
-        'Введите название города, в котором хотите узнать погоду'
+        'Введите название города, в котором хотите узнать погоду',
+        reply_markup=types.ReplyKeyboardRemove(),
         )
     
     await state.set_state(GetWeather.city)
@@ -26,8 +30,8 @@ async def start_bot(message: types.Message, state: FSMContext):
 @user_private_router.message(StateFilter(GetWeather.pre_city))
 async def get_city(message: types.Message, state: FSMContext):
     await message.answer(
-        'Не удалось найти город, попробуйте ещё раз',
-        # reply_markup=types.ReplyKeyboardRemove(),
+        'Введите название города, в котором хотите узнать погоду',
+        reply_markup=types.ReplyKeyboardRemove(),
         )
        
     await state.set_state(GetWeather.city)
@@ -40,6 +44,7 @@ async def get_day(message: types.Message, state: FSMContext):
     city = status_data['city'].lower()
     if requests.get(f'https://pogoda.mail.ru/prognoz/{city}/').status_code == 404:
         await state.set_state(GetWeather.pre_city)
+        await message.answer('Не удалось найти город')
         await get_city(message, state)
         return
     global parser
@@ -54,10 +59,10 @@ async def get_day(message: types.Message, state: FSMContext):
     await state.set_state(GetWeather.day)
 
 
-# @user_private_router.message(StateFilter(GetWeather.day), F.text == 'Отмена')
-# async def return_to_city(message: types.Message, state: FSMContext):
-#     await state.set_state(GetWeather.pre_city)
-#     await message.answer('Введите название города, в котором хотите узнать погоду',)
+@user_private_router.message(and_f(StateFilter(GetWeather.day), F.text == 'Отмена'))
+async def return_to_city(message: types.Message, state: FSMContext):
+    await state.set_state(GetWeather.pre_city)
+    await get_city(message, state)
 
 
 @user_private_router.message(StateFilter(GetWeather.day), F.text)
@@ -67,7 +72,6 @@ async def show_weather(message: types.Message, state: FSMContext):
 
     day_dict, _ = await parser.get_days_dict_and_list()
     res_data = await asyncio.create_task(parser.get_result_data(day=day_dict[data['day']]))
-    # res_data = await asyncio.create_task(main(callback_query_dict[data['day']]))
     await message.answer(str(res_data))
-    
-    # await state.clear()
+    await state.clear()
+    await start_bot(message, state)
