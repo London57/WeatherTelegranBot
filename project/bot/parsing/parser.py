@@ -8,7 +8,8 @@ class Parser:
         self.city = city
         self.soup = BeautifulSoup(requests.get(f'https://pogoda.mail.ru/prognoz/{city}/').text, 'lxml')
     
-    async def dates(self, day):
+    async def dates_to_keyboard(self, day):
+        print(day)
         if day == 0:
             data = 'Сегодня'
         else:
@@ -18,40 +19,60 @@ class Parser:
         return data
 
     async def get_date(self, day, data={}):
-        data['date'] = self.soup.find_all('div', class_="day day_index")[day].find('div',
+        if day == 0:
+            data['data'] = 'Cегодня'
+        else:
+            data['date'] = self.soup.find_all('div', class_="day day_index")[day-1].find('div',
                                                                 class_="day__date").text
         return data
 
     async def get_temperature(self, day, data={}):
-        temp = self.soup.find_all('div', class_="day day_index")[day].find('div',
-                                                                class_="day__temperature").text.replace('\n', '').replace('\t', '')
-        data['day_temp'] = temp[:4] + 'C'
-        data['night_temp'] = temp[4:] + 'C'
+        print('xjjj')
+        if day == 0:
+            data['day_temp'] = self.soup.find_all('div', class_='information__content__period__temperature')[0].text
+            data['night_temp'] = self.soup.find_all('div', class_='information__content__period__temperature')[1].text
+        else:
+            temp = self.soup.find_all('div', class_="day day_index")[day-1].find('div',
+                                                                    class_="day__temperature").text.replace('\n', '').replace('\t', '')
+            data['day_temp'] = temp[:4]
+            data['night_temp'] = temp[4:]
         return data
 
     async def get_description(self, day, data={}):
-        data['description'] = self.soup.find_all('div', class_="day day_index")[day].find('div',
+        if day == 0:
+            data['description'] = self.soup.find_all('div', class_="information__content__additional information__content__additional_first")[0]\
+                                            .find('div', class_='information__content__additional__item').text.replace('\t', '')\
+                                                                                                               .replace('\n', '')
+        else:
+            data['description'] = self.soup.find_all('div', class_="day day_index")[day-1].find('div',
                                                                 class_="day__description").text
         return data
         
     async def get_humidity(self, day, data={}):
-        data['humidity'] = self.soup.find_all('div', class_="day day_index")[day].find_all('div',
-                                                                class_="day__additional")[1].text.replace('\n', '').replace('\t', '')
+        if day == 0:
+            data['humidity'] = self.soup.find('div', class_='information__content__additional information__content__additional_second')\
+                                      .find_all('div', class_='information__content__additional__item')[1]\
+                                      .find('span').text[:5].replace('\t', '')\
+                                                            .replace('\n', '')
+        else:
+            data['humidity'] = self.soup.find_all('div', class_="day day_index")[day-1]\
+                                    .find_all('div', class_="day__additional")[1].text.replace('\n', '')\
+                                                                                       .replace('\t', '')
         return data
 
     async def get_breeze(self, day, data={}):
-        data['breeze'] = self.soup.find_all('div', class_="day day_index")[day].find_all('div',
+        data['breeze'] = self.soup.find_all('div', class_="day day_index")[day-1].find_all('div',
                                                                 class_="day__additional")[2].text.replace('\n', '').replace('\t', '')
         return data
 
     async def get_precipitation(self, day, data={}):
-        data['precipitation'] = self.soup.find_all('div', class_="day day_index")[day].find_all('div',
+        data['precipitation'] = self.soup.find_all('div', class_="day day_index")[day-1].find_all('div',
                                                                 class_="day__additional")[4].text.replace('\n', '').replace('\t', '')
         return data
     
 
     async def get_functions_list(self):
-        return [self.get_date, self.get_breeze, self.get_description, self.get_humidity, self.get_description, self.get_precipitation] 
+        return [self.get_date, self.get_temperature, self.get_breeze, self.get_description, self.get_humidity, self.get_description, self.get_precipitation] 
 
 
     async def get_result_data(self, day):
@@ -64,17 +85,15 @@ class Parser:
         return result_dict
 
 
-
-
     async def get_days_dict_and_list(self):
         days_list, tasks = [], []
-        for i in range(7):
-            tasks.append(asyncio.create_task(self.dates(i)))
+        for i in range(9):
+            tasks.append(asyncio.create_task(self.dates_to_keyboard(i)))
         
         #create task for today day here
         for task in tasks:
             days_list.append(await task)
-        days_dict = {days_list[i]: i for i in range(7)}
+        days_dict = {days_list[i]: i for i in range(9)}
         return days_dict, days_list
         
 

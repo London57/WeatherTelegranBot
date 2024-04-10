@@ -4,8 +4,8 @@ import asyncio
 
 async def get_keyboard(parser, tasks=[], day_list=[]):
     
-    for i in range(0, 8):
-        tasks.append(asyncio.create_task(parser.dates(i)))
+    for i in range(8):
+        tasks.append(asyncio.create_task(parser.dates_to_keyboard(i)))
         
     #create task for today day here
     for task in tasks:
