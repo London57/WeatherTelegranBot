@@ -11,5 +11,8 @@ query_create_db = (f'''
                 CREATE TABLE IF NOT EXISTS {TABLE_NAME} (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     {user_field} TEXT NOT NULL,
-                    {cities_field} TEXT NOT NULL UNIQUE)
+                    {cities_field} TEXT NOT NULL)
             ''')
+
+def replace_select_data(data: tuple):
+    return str(data).replace("('",'').replace("',)", '')
