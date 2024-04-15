@@ -1,4 +1,4 @@
-.env
+env
 venv/
-chr.py
-__pycache__
+__pycache__/
+t.py
