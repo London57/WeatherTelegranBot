@@ -2,30 +2,22 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 import asyncio
 
 
-async def get_keyboard(parser, tasks=[], day_list=[]):
+async def get_days_keyboard(parser, tasks=[], day_list=[]):
     
     for i in range(8):
         tasks.append(asyncio.create_task(parser.dates_to_keyboard(i)))
         
-    #create task for today day here
     for task in tasks:
         day_list.append(await task)
    
-    # callback_query_dict = {day_list[i]: i for i in range(7)}
 
     keyboard = ReplyKeyboardMarkup(
         keyboard=[
             [
-                KeyboardButton(text=day_list[0]),
-                KeyboardButton(text=day_list[1]),
-                KeyboardButton(text=day_list[2]),
-                KeyboardButton(text=day_list[3]),
+                KeyboardButton(text=day_list[i]) for i in range(4)
             ],
             [
-                KeyboardButton(text=day_list[4]),
-                KeyboardButton(text=day_list[5]),
-                KeyboardButton(text=day_list[6]),
-                KeyboardButton(text=day_list[7]),
+                KeyboardButton(text=day_list[i]) for i in range(4, 8)
             ],
             [
                 KeyboardButton(text='Отмена'),
@@ -38,3 +30,13 @@ async def get_keyboard(parser, tasks=[], day_list=[]):
 
 
 
+def get_cities_keyboard(cities):
+    keyboard = ReplyKeyboardMarkup(
+        keyboard=[
+            [
+                KeyboardButton(text=cities[i]) for i in range(4)
+            ],
+        ],
+        resize_keyboard=True
+    )
+    return keyboard

@@ -33,11 +33,17 @@ class DataBase:
             SELECT {cities_field} FROM {TABLE_NAME}
             WHERE {user_field} == {user_id}
         ''')
-        cities = cursor.fetchall()
+        
+        cities = [replace_select_data(row) for row in cursor.fetchall()]
         for city_db in cities:
             if replace_select_data(city_db) == city:
                 return
-        
+        print(cities, type(cities))
+        if len(cities) > 3:
+            cursor.execute(f'''
+                DELETE FROM {TABLE_NAME}
+                WHERE {user_field} == {user_id} and {cities_field} == '{cities[0]}';
+            ''')
         cursor.execute(f'''
             INSERT INTO {TABLE_NAME} ({user_field}, {cities_field}) VALUES({user_id}, '{city}');
         ''')
@@ -49,10 +55,7 @@ class DataBase:
             SELECT {cities_field} FROM {TABLE_NAME}
             WHERE {user_field}=={user_id};
         ''')
-        data = cursor.fetchall()
-        
-        r_data = [replace_select_data(row) for row in data]
-        print('model', r_data)
-        print(r_data)
+
+        r_data = [replace_select_data(row) for row in cursor.fetchall()]
         return r_data
 
