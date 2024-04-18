@@ -1,6 +1,6 @@
 import sqlite3
-from .query import (DATABASE_NAME, TABLE_NAME, query_create_db,
-                    user_field, cities_field, replace_select_data)
+from .query import *
+from datetime import datetime
 
 
 def create_db(db_name):
@@ -32,12 +32,19 @@ class DataBase:
         cursor.execute(f'''
             SELECT {cities_field} FROM {TABLE_NAME}
             WHERE {user_field} == {user_id}
+            ORDER BY {date_field} 
         ''')
         
         cities = [replace_select_data(row) for row in cursor.fetchall()]
+
         for city_db in cities:
-            if replace_select_data(city_db) == city:
-                return
+            city_db = replace_select_data(city_db)
+            if city_db == city:
+                cursor.execute(F'''
+                    UPDATE {TABLE_NAME} 
+                    SET {date_field} == '{datetime.now()}'
+                    WHERE {user_field} == {user_id} and {cities_field} == '{city_db}'
+                ''')
         print(cities, type(cities))
         if len(cities) > 3:
             cursor.execute(f'''
@@ -45,7 +52,9 @@ class DataBase:
                 WHERE {user_field} == {user_id} and {cities_field} == '{cities[0]}';
             ''')
         cursor.execute(f'''
-            INSERT INTO {TABLE_NAME} ({user_field}, {cities_field}) VALUES({user_id}, '{city}');
+            INSERT INTO {TABLE_NAME} 
+            ({user_field}, {cities_field}, {date_field})
+            VALUES({user_id}, '{city}', '{datetime.now()}');
         ''')
         
 
@@ -55,7 +64,8 @@ class DataBase:
             SELECT {cities_field} FROM {TABLE_NAME}
             WHERE {user_field}=={user_id};
         ''')
-
+        
         r_data = [replace_select_data(row) for row in cursor.fetchall()]
+        print(r_data)
         return r_data
 

@@ -9,7 +9,7 @@ class DataParserMixin:
 
     async def get_date(self, day, data={}):
         if day == 0:
-            data['data'] = 'Cегодня'
+            data['date'] = 'Cегодня'
         else:
             data['date'] = self.soup.find_all('div', class_="day day_index")[day-1].find('div',
                                                                 class_="day__date").text

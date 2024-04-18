@@ -34,7 +34,7 @@ def get_cities_keyboard(cities):
     keyboard = ReplyKeyboardMarkup(
         keyboard=[
             [
-                KeyboardButton(text=cities[i]) for i in range(4)
+                KeyboardButton(text=cities[i]) for i in range(len(cities))
             ],
         ],
         resize_keyboard=True
