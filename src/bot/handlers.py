@@ -27,6 +27,7 @@ async def start_bot(message: types.Message, state: FSMContext):
 
     cities = await asyncio.create_task(db.get_cities(user_id=message.from_user.id))
     keyboard = get_cities_keyboard(cities)
+    print('cityies in h',cities)
     await message.answer(
         'Введите название города, в котором хотите узнать погоду',
         reply_markup=keyboard,
