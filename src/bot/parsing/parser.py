@@ -1,6 +1,10 @@
-import asyncio
+import asyncio, requests
 from .mixins import DataParserMixin
 
+
+def city_not_found(city: str) -> bool:
+    return requests.get(f'https://pogoda.mail.ru/prognoz/{city}/').status_code == 404
+        
 
 class Parser(DataParserMixin):
     def __init__(self, *args, **kwargs):

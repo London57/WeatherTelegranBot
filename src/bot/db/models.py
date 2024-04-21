@@ -1,11 +1,10 @@
 import sqlite3
 from .query import *
-from datetime import datetime
 import asyncio
 
 
 
-async def create_db(db_name):
+async def create_db(db_name) -> None:
     with sqlite3.connect(db_name) as connection:
         cursor = connection.cursor()
         cursor.execute(query_create_db)
@@ -27,7 +26,6 @@ class DataBase(AsyncQueryDb):
     
     @connect_db
     async def insert_city(self, cursor, user_id: int, city: str) -> None:
-
         user_cities = await asyncio.create_task(self.selectUserCities(cursor, user_id=user_id))
         city_in_db = await asyncio.create_task(self.update_city(cursor, city, user_id, user_cities))
         await asyncio.create_task(self.delete_first_city(cursor, user_cities, user_id))
