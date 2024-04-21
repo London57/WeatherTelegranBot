@@ -33,7 +33,7 @@ class DataParserMixin:
                                                                                                                .replace('\n', '')
         else:
             data['description'] = self.soup.find_all('div', class_="day day_index")[day-1].find('div',
-                                                                class_="day__description").text[2:8]
+                                                                class_="day__description").text
         return data
         
     async def get_humidity(self, day, data={}):

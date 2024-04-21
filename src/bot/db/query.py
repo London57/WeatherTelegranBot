@@ -29,9 +29,9 @@ class AsyncQueryDb:
             ORDER BY {date_field} 
         ''')
         data = cursor.fetchall()
-        print('data: ', data)
+        # print('data: ', data)
         cities = [replace_select_data(row) for row in data]
-        print('data после', cities)
+        # print('data после', cities)
         return cities
     
     async def update_city(self, cursor, city, user_id, cities):
@@ -44,6 +44,7 @@ class AsyncQueryDb:
                             SET {date_field} == '{datetime.now()}'
                             WHERE {user_field} == {user_id} and {cities_field} == '{city_db}'
                         ''')
+                        return 1
                     
     async def delete_first_city(self, cursor, cities, user_id) -> None:
         if len(cities) > 3:

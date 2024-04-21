@@ -5,10 +5,10 @@ from aiogram.fsm.context import FSMContext
 from .keyboards import get_days_keyboard, get_cities_keyboard
 from .fsm import GetWeather
 import asyncio
-from .parsing.parsers import Parser
+from .parsing.parser import Parser
 import requests
 from .db.models import DataBase
-
+from time import time
 
 
 
@@ -24,16 +24,17 @@ dp.include_router(user_private_router)
 async def start_bot(message: types.Message, state: FSMContext):
     global db
     db = DataBase()
-
+    t1 = time()
     cities = await asyncio.create_task(db.get_cities(user_id=message.from_user.id))
     keyboard = get_cities_keyboard(cities)
-    print('cityies in h',cities)
     await message.answer(
         'Введите название города, в котором хотите узнать погоду',
         reply_markup=keyboard,
         )
     
     await state.set_state(GetWeather.city)
+    t2 = time()
+    print('get', t2-t1)
  
 
 @user_private_router.message(StateFilter(GetWeather.pre_city))
@@ -47,7 +48,7 @@ async def get_city(message: types.Message, state: FSMContext):
 
 @user_private_router.message(StateFilter(GetWeather.city), F.text)
 async def get_day(message: types.Message, state: FSMContext):
-    
+    t1 = time()
     await state.update_data(city=message.text)
     status_data = await state.get_data()
     city = status_data['city'].lower()
@@ -69,7 +70,8 @@ async def get_day(message: types.Message, state: FSMContext):
         reply_markup=keyboard,
         )
     await state.set_state(GetWeather.day)
-
+    t2 = time()
+    print('insert: ', t2-t1)
 
 @user_private_router.message(and_f(StateFilter(GetWeather.day), F.text == 'Отмена'))
 async def return_to_city(message: types.Message, state: FSMContext):
