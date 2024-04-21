@@ -1,4 +1,4 @@
 env
 venv/
-__pycache__
-t.py
+__pycache__/
+sqlite3.db
