@@ -1,5 +1,5 @@
 import asyncio, requests
-from .mixins import DataParserMixin
+from .weather import DataParserMixin
 
 
 def city_not_found(city: str) -> bool:
@@ -10,7 +10,7 @@ class Parser(DataParserMixin):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    async def dates_to_keyboard(self, day):
+    async def dates_to_keyboard(self, day: int) -> str:
         if day == 0:
             data = 'Сегодня'
         else:
@@ -19,7 +19,7 @@ class Parser(DataParserMixin):
         return data
 
 
-    async def get_result_data(self, day):
+    async def get_result_data(self, day: int) -> dict:
         tasks, result_dict = [], {}
         function_list = await asyncio.create_task(self.get_functions_list())
         for index in range(len(function_list)):
@@ -34,7 +34,6 @@ class Parser(DataParserMixin):
         for i in range(9):
             tasks.append(asyncio.create_task(self.dates_to_keyboard(i)))
         
-        #create task for today day here
         for task in tasks:
             days_list.append(await task)
         days_dict = {days_list[i]: i for i in range(9)}

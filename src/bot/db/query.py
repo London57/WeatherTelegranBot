@@ -23,7 +23,7 @@ def replace_select_data(data: tuple):
 
 class AsyncQueryDb:
 
-    async def selectUserCities(self, cursor, user_id) -> list:
+    async def selectUserCities(self, cursor, user_id: int) -> list:
         cursor.execute(f'''
             SELECT {cities_field} FROM {TABLE_NAME}
             WHERE {user_field} == {user_id}
