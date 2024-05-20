@@ -7,31 +7,33 @@ import asyncio
 from .keyboards import get_days_keyboard, get_cities_keyboard
 from .fsm import GetWeather
 from .parsing.parser import Parser, city_not_found
-from .db.models import DataBase
+from .db.services import CityRepositoryService
+from .db.init_db import create_db_model
 
 
 dp = Dispatcher()
- 
+repo = CityRepositoryService(create_db_model())
 
-@dp.message(CommandStart)
+
+@dp.message(CommandStart())
 async def start_bot(message: Message, state: FSMContext):
-    global db
-    db = DataBase()
-    cities = await asyncio.create_task(db.get_cities(user_id=message.from_user.id))
+
+    cities = repo.get_cities(user_id=message.from_user.id)
+    print(cities)
     keyboard = get_cities_keyboard(cities)
     await message.answer(
         'Введите название города, в котором хотите узнать погоду',
         reply_markup=keyboard,
         )
-    
+    print('ffffffffffff')
     await state.set_state(GetWeather.city)
  
 
 @dp.message(StateFilter(GetWeather.pre_city))
-async def get_city(message: Message,state: FSMContext):
-    cities = await asyncio.create_task(db.get_cities(user_id=message.from_user.id))
+async def get_city(message: Message, state: FSMContext):
+    cities = repo.get_cities(user_id=message.from_user.id)
     cities_keyboard = get_cities_keyboard(cities)
-    print(message.text)
+    print('__________________')
     await message.answer(
         'Введите название города, в котором хотите узнать погоду',
         reply_markup=cities_keyboard,
@@ -41,15 +43,13 @@ async def get_city(message: Message,state: FSMContext):
 
 @dp.message(StateFilter(GetWeather.city), F.text)
 async def get_day(message: Message, state: FSMContext):
-    await state.update_data(city=message.text)
-    status_data = await state.get_data()
-    city = status_data['city'].lower()
-    
+    city = message.text.lower()
+    await state.update_data(city=city)
+
     if city_not_found(city):
         await state.set_state(GetWeather.pre_city)
         await message.answer('Не удалось найти город')
         return
-    
 
     global parser
     parser = Parser(city=city)
@@ -62,7 +62,7 @@ async def get_day(message: Message, state: FSMContext):
         reply_markup=days_keyboard,
         )
     
-    await asyncio.create_task(db.insert_city(user_id=message.from_user.id, city=city))
+    repo.insert_city(user_id=message.from_user.id, city=city)
     await state.set_state(GetWeather.day)
 
 @dp.message(and_f(StateFilter(GetWeather.day), F.text == 'Отмена'))
